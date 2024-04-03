@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assignment</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Assignment</title>
+	<!-- Datatables library -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.11.5/datatables.min.css" />
 </head>
+
 <body>
-    <div id="results"></div>
+	<div id="results"></div>
+
+
+	<!-- *************************** -->
+	<!-- TABLE IS NOT IMMEDIATELY DISPLAYING DATA UNTIL INTERACTED WITH. I AM UNSURE IF THIS IS EXPECTED -->
+	<!-- *************************** -->
+
+	<!-- DataTables table element -->
+	<table id="dataTable" class="display">
+		<thead>
+			<tr>
+				<th>SO Number</th>
+				<th>Date Created</th>
+				<th>Note</th>
+				<th>Ship To</th>
+				<th>Total Price</th>
+				<th>Total Tax</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
 </body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.11.5/datatables.min.js"></script>
 <script id="data" type="application/json">
 	[
 		{
@@ -488,5 +515,64 @@
 			"so_totaltax": 0.000000000
 		}
 	]    
+	
 </script>
+<script>
+	// Access the script tag containing JSON data
+	var jsonDataElement = document.getElementById('data');
+	var jsonDataString = jsonDataElement.textContent;
+
+	// Parse the JSON data
+	var jsonData;
+	try {
+		jsonData = JSON.parse(jsonDataString);
+		console.log(jsonData); // Check if JSON data is parsed successfully
+	} catch (error) {
+		console.error('Error parsing JSON:', error);
+	}
+
+	// Initialize DataTable with JSON data
+	document.addEventListener("DOMContentLoaded", function () {
+		var table = document.getElementById('dataTable');
+		var dataTable = new DataTable(table, {
+			data: jsonData,
+			columns: [
+				{ data: 'so_num' },
+				{
+					data: 'so_datecreated',
+					render: function (data) {
+						// Format date as mm/dd/yyyy
+						var date = new Date(data);
+						var formattedDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+						return formattedDate;
+					}
+				},
+				{ data: 'so_note' },
+				{ data: 'shipto_name' },
+				{
+					data: 'so_totalprice',
+					render: function (data) {
+						// Format price as currency
+						return '$' + data.toFixed(2);
+					}
+				},
+				{
+					data: 'so_totaltax',
+					render: function (data) {
+						// Format tax as currency
+						return '$' + data.toFixed(2);
+					}
+				},
+				{
+					data: 'so_taxrate',
+					render: function (data) {
+						// Format tax rate as percentage
+						return (data * 100).toFixed(2) + '%';
+					}
+				}
+			]
+		});
+	});
+</script>
+
 </html>
